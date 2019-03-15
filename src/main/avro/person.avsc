@@ -1,0 +1,32 @@
+{
+  "namespace": "net.michir.data",
+  "type": "record",
+  "name": "Person",
+  "doc": "Person representation",
+  "fields": [
+    {
+      "name": "firtname",
+      "type": "string",
+      "doc": "Firstname"
+    },
+    {
+      "name": "lastname",
+      "type": "string",
+      "doc": "Lastname"
+    },
+    {
+      "name": "age",
+      "type": "int",
+      "doc": "Age"
+    },
+    {
+      "name": "nickname",
+      "type": [
+        "null",
+        "string"
+      ],
+      "doc": "Nickname",
+      "default": null
+    }
+  ]
+}
