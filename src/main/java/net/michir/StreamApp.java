@@ -7,7 +7,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.Properties;
 
@@ -23,9 +23,11 @@ public class StreamApp {
         properties.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://192.168.3.103:8081");
 
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, Person> stream = streamsBuilder.stream("mic");
-
-
+        streamsBuilder.<String, Person>stream("mic")
+                .groupByKey()
+                .count()
+                .toStream()
+                .to("mic-out", Produced.with(Serdes.String(), Serdes.Long()));
 
         KafkaStreams kafkaStreams = new KafkaStreams(streamsBuilder.build(), properties);
         kafkaStreams.start();

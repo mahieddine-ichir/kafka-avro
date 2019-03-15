@@ -9,7 +9,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.IntStream;
 
 public class ProducerApp {
 
@@ -35,7 +34,6 @@ public class ProducerApp {
             i++;
         }
 
-
     }
 
     private static void sendSync(Producer<String, GenericRecord> producer, Integer i) {
@@ -48,7 +46,7 @@ public class ProducerApp {
                     .build();
 
             RecordMetadata recordMetadata = (RecordMetadata) producer
-                    .send(new ProducerRecord("mic", ""+i, person)).get();
+                    .send(new ProducerRecord("mic", person.getLastname(), person)).get();
 
             System.out.println(String.format("%s %d %d - age = %d", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), person.getAge())
             );
