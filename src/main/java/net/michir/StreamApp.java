@@ -26,6 +26,7 @@ public class StreamApp {
         KStream<String, Person> stream = streamsBuilder.stream("mic");
 
 
+
         KafkaStreams kafkaStreams = new KafkaStreams(streamsBuilder.build(), properties);
         kafkaStreams.start();
 

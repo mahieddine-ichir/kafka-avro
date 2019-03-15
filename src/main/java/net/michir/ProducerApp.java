@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 public class ProducerApp {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.3.103:9092");
@@ -26,10 +26,16 @@ public class ProducerApp {
         props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://192.168.3.103:8081");
 
         Producer<String, GenericRecord> producer = new KafkaProducer<>(props);
+        Runtime.getRuntime().addShutdownHook(new Thread(producer::close));
 
-        IntStream.range(1, 10).forEach(i -> sendSync(producer, i));
+        int i = 0;
+        while (true) {
+            sendSync(producer, i);
+            Thread.sleep(1000);
+            i++;
+        }
 
-        producer.close();
+
     }
 
     private static void sendSync(Producer<String, GenericRecord> producer, Integer i) {
@@ -37,20 +43,21 @@ public class ProducerApp {
 
             Person person = Person.newBuilder()
                     .setLastname("Doe" + (i % 3))
-                    .setFirtname("John")
-                    .setAge(40 + (i % 10))
+                    .setFirtname("John "+i)
+                    .setAge(20 + (i % 50))
                     .build();
 
             RecordMetadata recordMetadata = (RecordMetadata) producer
                     .send(new ProducerRecord("mic", ""+i, person)).get();
-            System.out.println(String.format("%s %d %d - age = %d",
-                    recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), person.getAge())
+
+            System.out.println(String.format("%s %d %d - age = %d", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset(), person.getAge())
             );
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
 
+    /*
     private static void sendASync(Producer<String, String> producer, Integer i) {
             producer.send(new ProducerRecord("avro", i, Integer.toString(i)), (recordMetadata, exception) -> {
                 System.out.println(String.format("%d - %s %d %d",
@@ -60,6 +67,6 @@ public class ProducerApp {
                     exception.printStackTrace();
                 }
             });
-    }
+    }*/
 
 }
